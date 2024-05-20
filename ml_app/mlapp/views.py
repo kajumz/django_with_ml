@@ -16,24 +16,11 @@ def index(request):
 
 
 def predict(request):
-    #f request.method == 'POST':
-    #    form = TextInputForm(request.POST)
-    #    if form.is_valid():
-    #        text = form.cleaned_data['text']
-    #        tokens = tokenizer.encode(text, return_tensors='pt', truncation=True)
-    #        with torch.no_grad():
-    #            last_hidden_states = bert_model(tokens)
-    #        embed = last_hidden_states.last_hidden_state
-    #        features = embed[0].mean(dim=0).tolist()
-    #        test = np.array(features)
-    #        test = test.reshape(1, -1)
-    #        prediction = model.predict(test)
-    #        return JsonResponse({'prediction': prediction[0]})
-    #else:
-    #    form = TextInputForm()
+    prediction = None
     if request.method == 'POST':
         form = TextForm(request.POST)
         if form.is_valid():
+
             text = form.cleaned_data['message']
             tokens = tokenizer.encode(text, return_tensors='pt', truncation=True)
             with torch.no_grad():
@@ -42,12 +29,21 @@ def predict(request):
             features = embed[0].mean(dim=0).tolist()
             test = np.array(features)
             test = test.reshape(1, -1)
-            prediction = model.predict(test)
-            return HttpResponse(prediction[0])
+            pred = model.predict(test)
+            if pred[0] == 0:
+                prediction = 'a'
+            elif pred[0] == 1:
+                prediction = 'b'
+            elif pred[0] == 2:
+                prediction = 'c'
+            elif pred[0] == 3:
+                prediction = 'd'
+            #return HttpResponse(prediction[0])
     else:
         form = TextForm()
     data = {
-        'form': form
+        'form': form,
+        'prediction': prediction
 
     }
     return render(request, 'predict.html', data)
