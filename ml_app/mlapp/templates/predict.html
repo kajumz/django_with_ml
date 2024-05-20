@@ -3,6 +3,9 @@
     {{form.as_p }}
     <input type="submit" value=Submit>
 </form>
+{% if prediction is not None %}
+    <h1>prediction: {{ prediction }}</h1>
+{% endif %}
 
 
 
